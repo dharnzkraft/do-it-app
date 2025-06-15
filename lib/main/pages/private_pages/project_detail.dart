@@ -67,6 +67,7 @@ class ProjectDetailPage extends StatelessWidget {
               const SizedBox(height: 16),
               Text("Description:", style: MarkTextStyles.bodyRegular16),
               Text(project['description'], style: MarkTextStyles.bodyRegular16),
+              Text(project['id'], style: MarkTextStyles.bodyRegular16),
               SizedBox(
                 height: size.height * .05,
               ),

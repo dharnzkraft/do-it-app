@@ -27,9 +27,22 @@ class _TaskListPageState extends State<TaskListPage> {
   Future<void> _loadTasks() async {
     final prefs = await SharedPreferences.getInstance();
     final tasksString = prefs.getString('tasks_${widget.projectId}');
+    if (tasksString != null) {
+    final decoded = jsonDecode(tasksString);
+    if (decoded is List) {
+      setState(() {
+        _tasks = List<Map<String, dynamic>>.from(decoded);
+      });
+    } else {
+      setState(() {
+        _tasks = [];
+      });
+    }
+  } else {
     setState(() {
-      _tasks = tasksString != null ? List<Map<String, dynamic>>.from(jsonDecode(tasksString)) : [];
+      _tasks = [];
     });
+  }
   }
 
   Future<void> _saveTasks() async {
@@ -44,7 +57,7 @@ class _TaskListPageState extends State<TaskListPage> {
   }
 
   void _showTaskForm({Map<String, dynamic>? task, int? index}) {
-    final nameController = TextEditingController(text: task?['name'] ?? '');
+    final nameController = TextEditingController(text: task?['taskName'] ?? '');
     final fromDateController = TextEditingController(text: task?['fromDate'] ?? '');
     final toDateController = TextEditingController(text: task?['toDate'] ?? '');
     final memberController = TextEditingController(text: task?['assignedMember'] ?? '');
@@ -94,10 +107,10 @@ class _TaskListPageState extends State<TaskListPage> {
                   text: index == null ? 'Add Task' : 'Update Task',
                   onPressed: () async {
                     final newTask = {
-                      'name': nameController.text.trim(),
+                      'taskName': nameController.text.trim(),
                       'fromDate': fromDateController.text.trim(),
                       'toDate': toDateController.text.trim(),
-                      'assignedTo': memberController.text.trim(),
+                      'assignedMember': memberController.text.trim(),
                       'tags': tagsController.text.trim().split(',').map((e) => e.trim()).toList(),
                       'comment': commentController.text.trim(),
                     };

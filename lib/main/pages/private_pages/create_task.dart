@@ -42,8 +42,17 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
   Future<void> _saveTaskLocally(Map<String, dynamic> task) async {
     final prefs = await SharedPreferences.getInstance();
     final key = 'tasks_${widget.projectId}';
+
+    List<dynamic> tasks = [];
     final existingTasksString = prefs.getString(key);
-    List<dynamic> tasks = existingTasksString != null ? jsonDecode(existingTasksString) : [];
+
+    if (existingTasksString != null) {
+    final decoded = jsonDecode(existingTasksString);
+
+      if (decoded is List) {
+        tasks = decoded;
+      } 
+    }
     tasks.add(task);
     await prefs.setString(key, jsonEncode(tasks));
   }
@@ -78,11 +87,16 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => TaskListPage(projectId: task['id'],),
+                          builder: (_) => TaskListPage(projectId: widget.projectId,),
                         ),
                       );
   }
 
+  @override
+  void initState() {
+    super.initState();
+   
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,7 +181,8 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
               const SizedBox(height: 24),
               CustomButton(
                 text: 'Add Task',
-                onPressed: _handleTaskCreation, label: 'Create Task',
+                onPressed: _handleTaskCreation, 
+                label: 'Create Task',
               )
             ],
           ),
